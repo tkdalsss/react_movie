@@ -4,6 +4,7 @@ import './Detail.css';
 
 function Detail(){
     const { id } = useParams();
+    const [ready, setReady] = useState(true);
     const [movie, setmovie] = useState([]);
 
     const getMovie = async () => {
@@ -11,6 +12,7 @@ function Detail(){
             await fetch(`https://yts.mx/api/v2/movie_details.json?movie_id=${id}`)
         ).json();
         setmovie(json.data.movie);
+        setReady(false);
     };
 
     useEffect(() => {
@@ -18,21 +20,29 @@ function Detail(){
     }, []);
 
     return (
-        <div id ="frame">
-            <h1>{movie.title}</h1> 
-            <h3>{movie.year}</h3>
-            <h4>★ {movie.rating}</h4>
-            <img src={movie.medium_cover_image} />
-            <div>
-                <p>{movie.title} ({movie.year})</p>
-                <ul>
-                    {/*{movie.genres.map(g=><li key={g}>{g}</li>)}*/}
+        <div class="Frame" style={{backgroundImage: `url(${movie.background_image})`}}>
+            {ready ? (
+                <div class="Loader">
+                    <span>Loading...</span>
+                </div>
+             ) :
+            (<div class="DetailFrame">
+                <h1>{movie.title}</h1>
+                <hr></hr>
+                <h3>{movie.year}</h3>
+                <p id="long">{movie.title_long}</p>
+                <p id="rating">★ {movie.rating} / 10</p>
+                <img src={movie.medium_cover_image} />
+                <ul class="DetailGenres">
+                    {movie.genres.map(g => <li key={g}>{g}</li>)}
                 </ul>
-                <select>
-                    <option>Intro: {movie.description_intro}</option>
-                    <option>Full: {movie.description_full}</option>
-                </select>
-            </div>
+                <div class="Intro">
+                    {movie.description_intro}
+                </div>
+                <div class="Full">
+                    {movie.description_full}
+                </div>
+            </div>)}   
         </div>
     );
 }
